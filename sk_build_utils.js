@@ -2,7 +2,7 @@ const SwitchKit = require('./SwitchKit.js');
 const {
     icbsSpec2hexstring,
     spanchannel2addrinfohexstring
-} = require('./switchkit_parse_utils.js');
+} = require('./sk_parse_utils.js');
 const hexstring = require('./hexstring.js');
 
 function buildOutseizeControl(context, span, channel, ICBs) {

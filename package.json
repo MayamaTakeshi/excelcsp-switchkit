@@ -1,14 +1,14 @@
 {
-  "name": "excelcsp-switchkit",
+  "name": "sk_proxy_client",
   "version": "1.0.0",
-  "description": "A nodejs module that permits to talk with with Dialogic Excel CSP using SwitchKit library",
+  "description": "A nodejs module that permits to talk with with Dialogic Excel CSP using sk_proxy_server",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MayamaTakeshi/excelcsp-switchkit.git"
+    "url": "git+https://github.com/MayamaTakeshi/sk_proxy_client.git"
   },
   "keywords": [
     "excel",
@@ -19,7 +19,7 @@
   "author": "MayamaTakeshi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MayamaTakeshi/excelcsp-switchkit/issues"
+    "url": "https://github.com/MayamaTakeshi/sk_proxy_client/issues"
   },
-  "homepage": "https://github.com/MayamaTakeshi/excelcsp-switchkit#readme"
+  "homepage": "https://github.com/MayamaTakeshi/sk_proxy_client#readme"
 }

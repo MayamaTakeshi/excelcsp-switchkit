@@ -1,6 +1,4 @@
-const SKProxyClient = require('../sk_proxy_client')
-
-const SwitchKit = require("../SwitchKit")
+const {SKProxyClient, SwitchKit} = require('../index')
 
 const args = {
     proxy_host: '192.168.2.101',

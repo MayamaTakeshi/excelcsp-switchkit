@@ -1,9 +1,5 @@
-const SKProxyClient = require('../sk_proxy_client')
+const {SKProxyClient, SwitchKit, ISDN} = require('../index')
 
-const SwitchKit = require("../SwitchKit")
-
-let ISDN = require('../ISDN')
-let sbu = require('../switchkit_build_utils')
 
 const args = {
     proxy_host: '192.168.2.101',

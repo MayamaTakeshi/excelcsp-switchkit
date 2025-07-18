@@ -1,7 +1,5 @@
 
-let SwitchKit = require('../SwitchKit')
-let ISDN = require('../ISDN')
-let sbu = require('../switchkit_build_utils')
+let {SwitchKit, ISDN, sk_build_utils} = require('../index')
 
 let context = 1
 let span = 80
@@ -37,6 +35,6 @@ let ICBs = [
 	],
 ]
 
-let msg = sbu.buildOutseizeControl(context, span, channel, ICBs)
+let msg = sk_build_utils.buildOutseizeControl(context, span, channel, ICBs)
 msg = JSON.stringify(msg)
 console.log(msg)

@@ -1,6 +1,4 @@
-const SKProxyClient = require('../sk_proxy_client')
-//
-const SwitchKit = require("../SwitchKit")
+const {SKProxyClient, SwitchKit}  = require('../index')
 
 const args = {
     proxy_host: '192.168.2.101',
@@ -41,10 +39,3 @@ client.on('disconnected', () => {
 client.on('error', (err) => {
     console.error('Application: An error occurred:', err.message);
 });
-
-process.on('SIGINT', () => {
-    console.log('\nApplication: Caught interrupt signal (Ctrl+C).');
-    client.disconnect();
-    process.exit(0);
-});
-

@@ -1,7 +1,4 @@
-
-let SwitchKit = require('../SwitchKit')
-let ISDN = require('../ISDN')
-let sbu = require('../switchkit_build_utils')
+const {SwitchKit, ISDN} = require('../index')
 
 let context = 1
 let span = 80

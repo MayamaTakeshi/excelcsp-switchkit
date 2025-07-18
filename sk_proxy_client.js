@@ -10,7 +10,7 @@
 const net = require('net');
 const EventEmitter = require('events');
 const SwitchKit = require('./SwitchKit')
-const switchkit_build_utils = require('./switchkit_build_utils')
+const sk_build_utils = require('./sk_build_utils')
 
 
 class SKProxyClient extends EventEmitter {
@@ -94,39 +94,39 @@ class SKProxyClient extends EventEmitter {
     }
 
     watchChannelGroup(context, groupName) {
-        this.sendCmd(switchkit_build_utils.buildWatchChannelGroup(context, groupName));
+        this.sendCmd(sk_build_utils.buildWatchChannelGroup(context, groupName));
     }
 
     requestChannel(context, groupName) {
-        this.sendCmd(switchkit_build_utils.buildRequestChannel(context, groupName));
+        this.sendCmd(sk_build_utils.buildRequestChannel(context, groupName));
     }
 
     appGroupRegister(groupName, context) {
-        this.sendCmd(switchkit_build_utils.buildAppGroupRegister(groupName, context));
+        this.sendCmd(sk_build_utils.buildAppGroupRegister(groupName, context));
     }
 
     sendOutseizeControl(context, span, channel, ICBs) {
-        this.sendMsg(switchkit_build_utils.buildOutseizeControl(context, span, channel, ICBs));
+        this.sendMsg(sk_build_utils.buildOutseizeControl(context, span, channel, ICBs));
     }
 
     sendOutpulseDigits(context, span, channel, digits) {
-        this.sendMsg(switchkit_build_utils.buildOutpulseDigits(context, span, channel, digits));
+        this.sendMsg(sk_build_utils.buildOutpulseDigits(context, span, channel, digits));
     }
 
     sendChannelPPLEventRequest(context, span, channel, componentId, pplEvent, ICBs) {
-        this.sendMsg(switchkit_build_utils.buildChannelPPLEventRequest(context, span, channel, componentId, pplEvent, ICBs));
+        this.sendMsg(sk_build_utils.buildChannelPPLEventRequest(context, span, channel, componentId, pplEvent, ICBs));
     }
 
     sendReleaseWithData(context, span, channel, releaseDataType, ICBs) {
-        this.sendMsg(switchkit_build_utils.buildReleaseWithData(context, span, channel, releaseDataType, ICBs));
+        this.sendMsg(sk_build_utils.buildReleaseWithData(context, span, channel, releaseDataType, ICBs));
     }
 
     sendRouteControl(context, ICBs) {
-        this.sendMsg(switchkit_build_utils.buildRouteControl(context, ICBs));
+        this.sendMsg(sk_build_utils.buildRouteControl(context, ICBs));
     }
 
     shutdown() {
-        this.sendCmd(switchkit_build_utils.buildCloseConnection());
+        this.sendCmd(sk_build_utils.buildCloseConnection());
     }
 
     _handleData(data) {
