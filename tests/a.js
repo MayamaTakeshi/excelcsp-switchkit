@@ -2,30 +2,23 @@ const SKProxyClient = require('../sk_proxy_client')
 //
 const SwitchKit = require("../SwitchKit")
 
-const HOST = '192.168.2.101'
-const PORT = 1313
+const args = {
+    proxy_host: '192.168.2.101',
+    proxy_port: 1313,
+    app_name: 'test',
+    app_version: '1.0.0',
+    app_description: 'test',
+    instance_id: 1234,
+    host: '192.168.33.3',
+    port: 1312,
+}
 
-const client = new SKProxyClient(HOST, PORT);
+const client = new SKProxyClient(args);
 
-// Listen for the 'connected' event
-client.on('connected', () => {
-    console.log('Application: Client is now connected!');
-    let appName = "test"
-    let appVersion = "1.0.0"
-    let appDescription = "a_test_app"
-    let instanceId = 4321
-    let host = "192.168.33.3"
-    let port= 1312
-    let cmd = `skj_initialize ${appName} ${appVersion} ${appDescription} ${instanceId} ${host} ${port}\n`
-    console.log(`Sending: ${cmd}`)
-    client.send(cmd)
-});
-
-// Listen for the 'data' event (parsed JSON messages)
-client.on('data', (data) => {
+client.on('event', evt => {
     console.log('Application: Received:')
-    console.log(data)
-    if(data._event_ == 'skj_initialize_ok') {
+    console.log(evt)
+    if(evt._event_ == 'skj_initialize_ok') {
         let pingLLC = {
              _sk_func_: 'sendMsg',
              tag: SwitchKit.Tag.PingLLC.id,
@@ -41,24 +34,14 @@ client.on('data', (data) => {
     }
 });
 
-// Listen for the 'disconnected' event
 client.on('disconnected', () => {
     console.log('Application: Client has disconnected.');
 });
 
-// Listen for 'error' events
 client.on('error', (err) => {
     console.error('Application: An error occurred:', err.message);
-    // Implement reconnection logic here if desired
-    // setTimeout(() => client.connect(), 5000);
 });
 
-// Connect to the server
-client.connect()
-    .then(() => console.log('Application: Connection attempt initiated successfully.'))
-    .catch(err => console.error('Application: Initial connection failed:', err.message));
-
-// Handle process exit to ensure graceful shutdown
 process.on('SIGINT', () => {
     console.log('\nApplication: Caught interrupt signal (Ctrl+C).');
     client.disconnect();

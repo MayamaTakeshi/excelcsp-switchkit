@@ -166,8 +166,8 @@ switchkit.init = function(params) {
         // tester_magic.expand_magic_ids(req); // This function is not defined in the provided code
         req['_sk_func_'] = 'sendMsg';
         if(typeof req.tag === 'object') {
-		req.tag = req.tag.id
-	}
+            req.tag = req.tag.id
+        }
         sendCmd(req);
     }
 

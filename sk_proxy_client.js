@@ -1,5 +1,5 @@
 /**
- * Node.js ExcelCSP SwitchKit proy client
+ * Node.js ExcelCSP SwitchKit proxy client
  *
  * This module provides a TcpClient class that extends EventEmitter.
  * It connects to a sk_proxy instance, listens for incoming single-line
@@ -9,83 +9,57 @@
 
 const net = require('net');
 const EventEmitter = require('events');
+const switchkit_build_utils = require('./switchkit_build_utils')
 
 class SKProxyClient extends EventEmitter {
-    /**
-     * Creates an instance of TcpClient.
-     * @param {string} host - The IP address or hostname of the TCP server.
-     * @param {number} port - The port number of the TCP server.
-     */
-    constructor(host, port) {
-        super(); // Call the EventEmitter constructor
+    constructor(args) {
+        super();
+ 
+        this.proxy_host = args.proxy_host
+        this.proxy_port = args.proxy_port
+        this.app_name = args.app_name.replace(/ /g, "_")
+        this.app_version = args.app_version.replace(/ /g, "_")
+        this.app_description = args.app_description.replace(/ /g, "_")
+        this.instance_id = parseInt(args.instance_id)
 
-        this.host = host;
-        this.port = port;
-        this.client = null; // The net.Socket instance
+        this.host = args.host
+        this.port = args.port
+
+        this.client = null;
         this.buffer = '';   // Buffer to accumulate incoming data until a newline is found
         this.isConnected = false; // Connection status flag
 
         // Bind methods to 'this' to ensure correct context when used as event listeners
-        this._handleConnect = this._handleConnect.bind(this);
         this._handleData = this._handleData.bind(this);
         this._handleEnd = this._handleEnd.bind(this);
         this._handleClose = this._handleClose.bind(this);
         this._handleError = this._handleError.bind(this);
-    }
 
-    /**
-     * Establishes a connection to the TCP server.
-     * @returns {Promise<void>} A promise that resolves when connected, or rejects on error.
-     */
-    connect() {
-        return new Promise((resolve, reject) => {
-            if (this.client && !this.client.destroyed) {
-                console.warn('Client already connected or connecting.');
-                if (this.isConnected) {
-                    return resolve();
-                } else {
-                    // If connecting, wait for existing connection attempt to complete
-                    this.client.once('connect', resolve);
-                    this.client.once('error', reject);
-                    return;
-                }
-            }
+        console.log(`Attempting to connect to ${this.proxy_host}:${this.proxy_port}...`);
 
-            console.log(`Attempting to connect to ${this.host}:${this.port}...`);
+        this.client = new net.Socket();
 
-            this.client = new net.Socket();
+        // Set up event listeners for the socket
+        this.client.on('data', this._handleData);
+        this.client.on('end', this._handleEnd);
+        this.client.on('close', this._handleClose);
+        this.client.on('error', this._handleError);
 
-            // Set up event listeners for the socket
-            this.client.on('connect', this._handleConnect);
-            this.client.on('data', this._handleData);
-            this.client.on('end', this._handleEnd);
-            this.client.on('close', this._handleClose);
-            this.client.on('error', this._handleError);
+        // Initiate the connection
+        this.client.connect(this.proxy_port, this.proxy_host, () => {
+            console.log("connected")
+            this.isConnected = true;
+            let cmd = `skj_initialize ${this.app_name} ${this.app_version} ${this.app_description} ${this.instance_id} ${this.host} ${this.port}\n`
+            console.log(`Sending: ${cmd}`)
+            this.client.write(cmd)
+        })
 
-            // Initiate the connection
-            this.client.connect(this.port, this.host, () => {
-                // This callback is specifically for the initial connection attempt
-                if (this.isConnected) {
-                    resolve();
-                } else {
-                    // If for some reason _handleConnect hasn't fired yet, wait for it
-                    this.client.once('connect', resolve);
-                }
-            });
-
-            // Handle connection errors during the initial connect attempt
-            this.client.once('error', (err) => {
-                // Only reject if it's the initial connection error
-                if (!this.isConnected) {
-                    reject(err);
-                }
-            });
+        // Handle connection errors during the initial connect attempt
+        this.client.once('error', (err) => {
+            this.emit('error', err)
         });
     }
 
-    /**
-     * Closes the TCP connection.
-     */
     disconnect() {
         if (this.client && !this.client.destroyed) {
             console.log('Disconnecting from server...');
@@ -96,10 +70,6 @@ class SKProxyClient extends EventEmitter {
         }
     }
 
-    /**
-     * Sends a message to the connected server.
-     * @param {string} message - The message string to send.
-     */
     send(message) {
         if (this.client && this.isConnected) {
             this.client.write(message + '\n'); // Append newline as per common line-based protocols
@@ -108,25 +78,59 @@ class SKProxyClient extends EventEmitter {
         }
     }
 
-    /**
-     * Internal handler for the 'connect' event.
-     * @private
-     */
-    _handleConnect() {
-        this.isConnected = true;
-        console.log(`Successfully connected to server at ${this.host}:${this.port}`);
-        this.emit('connected'); // Emit a custom 'connected' event
+    sendCmd(req) {
+        const json_req = JSON.stringify(req);
+        this.send(json_req);
     }
 
-    /**
-     * Internal handler for the 'data' event from the socket.
-     * Processes incoming data, extracts line-based messages, and parses JSON.
-     * Emits a 'data' event for each valid JSON object.
-     * @param {Buffer} data - The raw data buffer received from the server.
-     * @private
-     */
+    sendMsg(req) {
+        req['_sk_func_'] = 'sendMsg';
+        if(typeof req.tag === 'object') {
+            req.tag = req.tag.id
+        }
+        this.sendCmd(req);
+    }
+
+    watchChannelGroup(context, groupName) {
+        this.sendCmd(switchkit_build_utils.buildWatchChannelGroup(context, groupName));
+    }
+
+    requestChannel(context, groupName) {
+        this.sendCmd(switchkit_build_utils.buildRequestChannel(context, groupName));
+    }
+
+    appGroupRegister(groupName, context) {
+        this.sendCmd(switchkit_build_utils.buildAppGroupRegister(groupName, context));
+    }
+
+    sendOutseizeControl(context, span, channel, ICBs) {
+        this.sendMsg(switchkit_build_utils.buildOutseizeControl(context, span, channel, ICBs));
+    }
+
+    sendOutpulseDigits(context, span, channel, digits) {
+        this.sendMsg(switchkit_build_utils.buildOutpulseDigits(context, span, channel, digits));
+    }
+
+    sendChannelPPLEventRequest(context, span, channel, componentId, pplEvent, ICBs) {
+        this.sendMsg(switchkit_build_utils.buildChannelPPLEventRequest(context, span, channel, componentId, pplEvent, ICBs));
+    }
+
+    sendReleaseWithData(context, span, channel, releaseDataType, ICBs) {
+        this.sendMsg(switchkit_build_utils.buildReleaseWithData(context, span, channel, releaseDataType, ICBs));
+    }
+
+    sendRouteControl(context, ICBs) {
+        this.sendMsg(switchkit_build_utils.buildRouteControl(context, ICBs));
+    }
+
+    shutdown() {
+        this.sendCmd(switchkit_build_utils.buildCloseConnection());
+    }
+
     _handleData(data) {
+        //console.log("data", data)
         this.buffer += data.toString();
+        //console.log(this.buffer.toString())
 
         let newlineIndex;
         // Process the buffer line by line
@@ -140,9 +144,9 @@ class SKProxyClient extends EventEmitter {
             if (message.length > 0) {
                 try {
                     // Attempt to parse the message as a JSON string
-                    const jsonObject = JSON.parse(message);
-                    // console.log('Parsed JSON:', jsonObject); // For debugging
-                    this.emit('data', jsonObject); // Emit the 'data' event with the parsed JSON
+                    const evt = JSON.parse(message);
+                    //console.log('evt:', evt)
+                    this.emit('event', evt); 
                 } catch (e) {
                     console.error('Error parsing JSON:', e.message);
                     console.error('Invalid message received:', message);
@@ -152,34 +156,20 @@ class SKProxyClient extends EventEmitter {
         }
     }
 
-    /**
-     * Internal handler for the 'end' event from the socket (server initiated disconnect).
-     * @private
-     */
     _handleEnd() {
         console.log('Server initiated disconnect.');
+        this.emit('end')
         // The 'close' event will follow, which handles cleanup
     }
 
-    /**
-     * Internal handler for the 'close' event from the socket.
-     * Fired when the connection is fully closed.
-     * @private
-     */
     _handleClose() {
         this.isConnected = false;
-        console.log('Connection closed.');
         this.client.destroy(); // Ensure resources are freed
         this.client = null;
         this.buffer = ''; // Clear buffer on close
-        this.emit('disconnected'); // Emit a custom 'disconnected' event
+        this.emit('close'); 
     }
 
-    /**
-     * Internal handler for the 'error' event from the socket.
-     * @param {Error} err - The error object.
-     * @private
-     */
     _handleError(err) {
         console.error(`TCP Client error: ${err.message}`);
         if (err.code === 'ECONNREFUSED') {

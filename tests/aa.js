@@ -1,32 +1,25 @@
-const switchkit = require('../switchkit')
+const SKProxyClient = require('../sk_proxy_client')
 
 const SwitchKit = require("../SwitchKit")
 
-const proxy_host = '192.168.2.101'
-const proxy_port = 1313
-const host = '192.168.33.3'
-const port = 1312
-const appName = 'test'
-const appVersion = '1.0.0'
-const appDescription = 'a_test_app'
-const instanceId = 1234
+const args = {
+    proxy_host: '192.168.2.101',
+    proxy_port: 1313,
+    app_name: 'test',
+    app_version: '1.0.0',
+    app_description: 'a_test_app',
+    instance_id: 1234,
+    host: '192.168.33.3',
+    port: 1312,
+}
 
-const client = switchkit.init({
-	proxy_host,
-	proxy_port,
-	appName,
-	appVersion,
-	appDescription,
-	instanceId,
-	host,
-	port,
-})
+const client = new SKProxyClient(args)
 
-switchkit.on('data', data => {
-    console.log("data", data)
-    if(data._event_ == 'skj_initialize_ok') {
-	console.log("calling watchChannelGroup")
-	switchkit.watchChannelGroup(1, "ISDN22")
+client.on('event', evt => {
+    console.log("event", evt)
+    if(evt._event_ == 'skj_initialize_ok') {
+        console.log("calling watchChannelGroup")
+        client.watchChannelGroup(1, "ISDN22")
     }
 })
 
