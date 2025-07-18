@@ -1,0 +1,13 @@
+--------------------------------------
+2025/07/18 takeshi
+
+We currently have switchkit.js that uses sk_proxy_client.js.
+So the apps will use a proxy to talk with LLC.
+This will simplify things as we will not have to deal with issues to install SwitchKit libs 
+and its dependencies.
+
+So, these could have been implemented as a single module.
+However, the plan is to eventually allow switchkit.js to use a module that uses switchkit libraries to talk with LLC.
+
+
+
