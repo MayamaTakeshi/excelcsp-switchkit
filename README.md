@@ -1,6 +1,6 @@
 # sk_proxy_client
 
-A nodejs module that permits to talk with with Dialogic Excel CSP using sk_proxy_server
+A nodejs module that permits to talk with with Dialogic Excel CSP using [sk_proxy_server](https://github.com/MayamaTakeshi/sk_proxy_server)
 
 ## Installation
 ```
