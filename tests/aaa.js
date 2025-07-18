@@ -1,6 +1,6 @@
-const switchkit = require('./switchkit')
+const switchkit = require('../switchkit')
 
-const SwitchKit = require("./SwitchKit")
+const SwitchKit = require("../SwitchKit")
 
 const proxy_host = '192.168.2.101'
 const proxy_port = 1313
@@ -11,8 +11,8 @@ const appVersion = '1.0.0'
 const appDescription = 'a_test_app'
 const instanceId = 1234
 
-let ISDN = require('./ISDN')
-let sbu = require('./switchkit_build_utils')
+let ISDN = require('../ISDN')
+let sbu = require('../switchkit_build_utils')
 
 const client = switchkit.init({
 	proxy_host,

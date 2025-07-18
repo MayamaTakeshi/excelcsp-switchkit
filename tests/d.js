@@ -1,7 +1,7 @@
 
-let SwitchKit = require('./SwitchKit')
-let ISDN = require('./ISDN')
-let sbu = require('./switchkit_build_utils')
+let SwitchKit = require('../SwitchKit')
+let ISDN = require('../ISDN')
+let sbu = require('../switchkit_build_utils')
 
 let context = 1
 let span = 80

@@ -1,6 +1,6 @@
-const switchkit = require('./switchkit')
+const switchkit = require('../switchkit')
 
-const SwitchKit = require("./SwitchKit")
+const SwitchKit = require("../SwitchKit")
 
 const proxy_host = '192.168.2.101'
 const proxy_port = 1313

@@ -1,7 +1,6 @@
 const SwitchKit = require('./SwitchKit.js');
 const ISDN = require('./ISDN.js');
 const SS7 = require('./SS7.js');
-const Brastel = require('./Brastel.js');
 const tester_magic = require('./tester_magic.js');
 const hexstring = require('./hexstring.js');
 
@@ -73,11 +72,6 @@ function icb_table_data_processing(icbType, icbSubType, icbData) {
     if (icbType === SwitchKit.ICBType.Data) {
         if (icbSubType === SwitchKit.DataICBSubType.ISDN_Formatted_IEs) {
             dict = SwitchKit.ISDN_Formatted_IE;
-            single_byte_id = true;
-            single_byte_len = true;
-            data = icbData;
-        } else if (icbSubType === SwitchKit.DataICBSubType.ISDN_Raw_IEs) {
-            dict = Brastel.Internal_ISDN_IE;
             single_byte_id = true;
             single_byte_len = true;
             data = icbData;
@@ -203,8 +197,6 @@ function parse_ICBsHexstring(icbCount, hstr) {
 
         if (icbType === SwitchKit.ICBType.Data && icbSubType === SwitchKit.DataICBSubType.ISDN_Formatted_IEs) {
             parsedIcb = [icbType, icbSubType, deserialize_elements(true, true, icb_data, SwitchKit.ISDN_Formatted_IE)];
-        } else if (icbType === SwitchKit.ICBType.Data && icbSubType === SwitchKit.DataICBSubType.ISDN_Raw_IEs) {
-            parsedIcb = [icbType, icbSubType, deserialize_elements(true, true, icb_data, Brastel.Internal_ISDN_IE)];
         } else if (icbType === SwitchKit.ICBType.Data && icbSubType === SwitchKit.DataICBSubType.SS7_Parameters) {
             const isup_message_id = icb_data.shift();
             parsedIcb = [icbType, icbSubType, [tester_magic.get_element(SS7.Message, isup_message_id), deserialize_elements(true, true, icb_data, SS7.Parameter)]];

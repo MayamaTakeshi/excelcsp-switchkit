@@ -1,6 +1,6 @@
-const SKProxyClient = require('./sk_proxy_client')
+const SKProxyClient = require('../sk_proxy_client')
 //
-const SwitchKit = require("./SwitchKit")
+const SwitchKit = require("../SwitchKit")
 
 const HOST = '192.168.2.101'
 const PORT = 1313
