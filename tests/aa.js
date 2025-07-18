@@ -23,5 +23,9 @@ client.on('event', evt => {
     }
 })
 
-
+process.on('SIGINT', () => {
+    console.log('\nApplication: Caught interrupt signal (Ctrl+C).');
+    client.disconnect();
+    process.exit(0);
+});
 
