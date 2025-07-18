@@ -20,10 +20,3 @@ client.on('event', evt => {
         client.watchChannelGroup(1, "ISDN22")
     }
 })
-
-process.on('SIGINT', () => {
-    console.log('\nApplication: Caught interrupt signal (Ctrl+C).');
-    client.disconnect();
-    process.exit(0);
-});
-

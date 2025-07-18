@@ -8,7 +8,7 @@ npm i sk_proxy_client
 ```
 
 ## Usage
-See exmaples on folder test.
+See examples inside folder test.
 
 ## Dialogic Excel CSP SwitchKit Documentation
 

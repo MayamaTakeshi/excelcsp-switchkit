@@ -32,8 +32,8 @@ client.on('event', evt => {
     }
 });
 
-client.on('disconnected', () => {
-    console.log('Application: Client has disconnected.');
+client.on('close', () => {
+    console.log('Application: close.');
 });
 
 client.on('error', (err) => {
