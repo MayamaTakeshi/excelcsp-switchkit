@@ -9,7 +9,9 @@
 
 const net = require('net');
 const EventEmitter = require('events');
+const SwitchKit = require('./SwitchKit')
 const switchkit_build_utils = require('./switchkit_build_utils')
+
 
 class SKProxyClient extends EventEmitter {
     constructor(args) {
@@ -146,6 +148,34 @@ class SKProxyClient extends EventEmitter {
                     // Attempt to parse the message as a JSON string
                     const evt = JSON.parse(message);
                     //console.log('evt:', evt)
+                    if (evt._event_ === 'sk_func_res' && evt.Success === true) {
+                        this.emit('event', evt);
+                        return
+                    }
+
+                    if (evt._event_ === 'sk_msg' || evt._event_ === 'sk_msg_ack') {
+                        evt.tag = SwitchKit.Tag[evt.tag];
+                    }
+
+                    if (evt._event_ === 'sk_msg') {
+                        if (evt.tag === SwitchKit.Tag.RFSWithData) {
+                            const icbCount = parseInt(evt.Data.substring(0, 2), 16);
+                            const icbData = evt.Data.substring(2);
+                            evt.ICBs = switchkit_parse_utils.parse_ICBsHexstring(icbCount, icbData);
+                        } else if (evt.tag === SwitchKit.Tag.CallProcessingEvent) {
+                            evt.Event = SwitchKit.CallProcessingEvent[evt.Event];
+                            if (evt.digits && _params.dtmf_to_prompts) {
+                                evt.prompts = _params.dtmf_to_prompts(evt.digits);
+                            }
+                        } else if (evt.tag === SwitchKit.Tag.PPLEventIndication) {
+                            evt.PPLEvent = SwitchKit.PPLEventIndication[evt.ComponentID][evt.PPLEvent];
+                            evt.ComponentID = SwitchKit.PPLComponentID[evt.ComponentID];
+                            evt.ICBs = switchkit_parse_utils.parse_ICBsHexstring(evt.ICBCount, evt.Data);
+                        } else if (evt.tag === SwitchKit.Tag.ChannelReleasedWithData) {
+                            evt.ICBs = switchkit_parse_utils.parse_ICBsHexstring(evt.ICBCount, evt.ICBData);
+                        }
+                    }
+ 
                     this.emit('event', evt); 
                 } catch (e) {
                     console.error('Error parsing JSON:', e.message);
