@@ -13,10 +13,10 @@ const args = {
 
 const client = new SKProxyClient(args);
 
-client.on('event', evt => {
+client.on('msg', msg => {
     console.log('Application: Received:')
-    console.log(evt)
-    if(evt._event_ == 'skj_initialize_ok') {
+    console.log(msg)
+    if(msg._event_ == 'skj_initialize_ok') {
         let pingLLC = {
              _sk_func_: 'sendMsg',
              tag: SwitchKit.Tag.PingLLC.id,

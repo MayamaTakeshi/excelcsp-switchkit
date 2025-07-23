@@ -149,7 +149,7 @@ class SKProxyClient extends EventEmitter {
                     const evt = JSON.parse(message);
                     //console.log('evt:', evt)
                     if (evt._event_ === 'sk_func_res' && evt.Success === true) {
-                        this.emit('event', evt);
+                        this.emit('msg', evt);
                         return
                     }
 
@@ -176,7 +176,7 @@ class SKProxyClient extends EventEmitter {
                         }
                     }
  
-                    this.emit('event', evt); 
+                    this.emit('msg', evt); 
                 } catch (e) {
                     console.error('Error parsing JSON:', e.message);
                     console.error('Invalid message received:', message);
