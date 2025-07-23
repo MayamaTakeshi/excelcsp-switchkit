@@ -15,7 +15,7 @@ const client = new SKProxyClient(args)
 
 client.on('msg', msg => {
     console.log("msg", msg)
-    if(msg._event_ == 'skj_initialize_ok') {
+    if(msg.event == 'skj_initialize_ok') {
         console.log("calling watchChannelGroup")
         client.watchChannelGroup(1, "ISDN22")
     }

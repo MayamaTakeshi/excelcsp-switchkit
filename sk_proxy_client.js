@@ -148,16 +148,16 @@ class SKProxyClient extends EventEmitter {
                     // Attempt to parse the message as a JSON string
                     const evt = JSON.parse(message);
                     //console.log('evt:', evt)
-                    if (evt._event_ === 'sk_func_res' && evt.Success === true) {
+                    if (evt.event === 'sk_func_res' && evt.Success === true) {
                         this.emit('msg', evt);
                         return
                     }
 
-                    if (evt._event_ === 'sk_msg' || evt._event_ === 'sk_msg_ack') {
+                    if (evt.event === 'sk_msg' || evt.event === 'sk_msg_ack') {
                         evt.tag = SwitchKit.Tag[evt.tag];
                     }
 
-                    if (evt._event_ === 'sk_msg') {
+                    if (evt.event === 'sk_msg') {
                         if (evt.tag === SwitchKit.Tag.RFSWithData) {
                             const icbCount = parseInt(evt.Data.substring(0, 2), 16);
                             const icbData = evt.Data.substring(2);
